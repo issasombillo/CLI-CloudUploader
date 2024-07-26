@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 /path/to/file"
+    echo "Usage: $0 "C:\Users\LENOVO-PC\Documents\Road to Millionaire\Cloud Engr\CLI-CloudUploader\test.txt""
     exit 1
 fi
 
