@@ -1,20 +1,20 @@
 #!/bin/bash
 
 if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 "C:\Users\LENOVO-PC\Documents\Road to Millionaire\Cloud Engr\CLI-CloudUploader\test.txt""
+    echo "Usage: $0 /path/to/file"
     exit 1
 fi
 
-test=$1
+FILE=$1
 
-if [ ! -f "$test" ]; then
+if [ ! -f "$FILE" ]; then
     echo "File not found!"
     exit 1
 fi
 
 BUCKET_NAME=issa1
 
-aws s3 cp "$test" s3://$BUCKET_NAME/
+aws s3 cp "$FILE" s3://$BUCKET_NAME/
 
 if [ $? -eq 0 ]; then
     echo "File uploaded successfully!"
