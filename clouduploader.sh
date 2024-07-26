@@ -5,16 +5,16 @@ if [ "$#" -ne 1 ]; then
     exit 1
 fi
 
-FILE=$1
+test=$1
 
-if [ ! -f "$FILE" ]; then
+if [ ! -f "$test" ]; then
     echo "File not found!"
     exit 1
 fi
 
 BUCKET_NAME=issa1
 
-aws s3 cp "$FILE" s3://$BUCKET_NAME/
+aws s3 cp "$test" s3://$BUCKET_NAME/
 
 if [ $? -eq 0 ]; then
     echo "File uploaded successfully!"
