@@ -12,7 +12,7 @@ if [ ! -f "$FILE" ]; then
     exit 1
 fi
 
-BUCKET_NAME=your-bucket-name
+BUCKET_NAME=issa1
 
 aws s3 cp "$FILE" s3://$BUCKET_NAME/
 
