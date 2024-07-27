@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 /path/to/file.txt"
+    echo "Usage: $0 /path/to/file"
     exit 1
 fi
 
