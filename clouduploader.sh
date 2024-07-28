@@ -1,51 +1,23 @@
-## Checks if AWS CLI is installed
-if command -v aws &>/dev/null; then
-    PROFILE_PATH="$HOME/.aws/config"
-    # If installed, checks if config profile exists 
-    if [ -e "$PROFILE_PATH" ]; then
-        echo -e "AWS CLI config profile found\n"
-        sleep 1
-    # Creates new AWS CLI profile
-    else
-        echo "AWS CLI installed - no config profile found"
-        sleep 1
-        echo "Create your profile now:"
-        sleep 1
-        aws configure
-        echo "Profile configured - please run command again."
-        exit 1
-    fi
-# Downloads and installs AWS CLI
-else
-    echo "AWS CLI not found – installing now..."
-    sleep 1
-    curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
-    sudo installer -pkg ./AWSCLIV2.pkg -target /
-    sleep 1
-    echo "AWS CLI installed – please run command again."
+#!/bin/bash
+
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 /path/to/file"
     exit 1
 fi
 
-## Prompts bucket selection
-echo -e "Available S3 Buckets:\n"
-aws s3 ls
-read -r -p "Select a bucket: " BUCKET
+FILE=$1
 
-## Bucket and file verifications
-if aws s3api head-bucket --bucket "$BUCKET" 1>/dev/null 2>/dev/null; then
-    echo -e "\n✓ Bucket permissions"
-else
-    echo "❌ Error – bucket doesn't exist."
-    exit 2
+if [ ! -f "$FILE" ]; then
+    echo "File not found!"
+    exit 1
 fi
 
-if [ -f "$1" ]; then
-    echo -e "✓ File (upload) permissions"
-else
-    echo "❌ Error - file doesn't exist"
-    exit 2
-fi
+BUCKET_NAME=issa1
 
-## Uploads file to selected bucket
-BUCKET_PATH="s3://$BUCKET"
-aws s3 cp "$1" "$BUCKET_PATH"
+aws s3 cp "$FILE" s3://$BUCKET_NAME/
+
+if [ $? -eq 0 ]; then
+    echo "File uploaded successfully!"
+else
+    echo "File upload failed!"
+fi
