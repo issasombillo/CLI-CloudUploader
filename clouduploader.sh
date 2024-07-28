@@ -19,11 +19,15 @@ if [ ! -f "$FILE" ]; then
     exit 1
 fi
 
-# Perform the upload to S3
-aws s3 cp "$FILE" s3://$BUCKET_NAME/
+# Perform the upload to S3 and capture the output
+OUTPUT=$(aws s3 cp "$FILE" s3://$BUCKET_NAME/ 2>&1)
+STATUS=$?
+
+# Print the output of the aws command for debugging
+echo "$OUTPUT"
 
 # Check the exit status of the aws command
-if [ $? -eq 0 ]; then
+if [ $STATUS -eq 0 ]; then
     echo "File uploaded successfully!"
 else
     echo "File upload failed!"
