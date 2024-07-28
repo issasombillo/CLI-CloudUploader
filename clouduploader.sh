@@ -1,42 +1,51 @@
-#!/bin/bash
-
-# Function to check if AWS CLI is configured
-function check_aws_cli() {
-    aws sts get-caller-identity > /dev/null 2>&1
-    if [ $? -ne 0 ]; then
-        echo "AWS CLI is not configured properly. Please run 'aws configure'."
+## Checks if AWS CLI is installed
+if command -v aws &>/dev/null; then
+    PROFILE_PATH="$HOME/.aws/config"
+    # If installed, checks if config profile exists 
+    if [ -e "$PROFILE_PATH" ]; then
+        echo -e "AWS CLI config profile found\n"
+        sleep 1
+    # Creates new AWS CLI profile
+    else
+        echo "AWS CLI installed - no config profile found"
+        sleep 1
+        echo "Create your profile now:"
+        sleep 1
+        aws configure
+        echo "Profile configured - please run command again."
         exit 1
     fi
-}
-
-# Prompt the user for the S3 bucket name
-read -p "Enter the S3 bucket name: " BUCKET_NAME
-
-# Prompt the user for the file name
-read -p "Enter the file name to upload: " FILE
-
-# Check if the file exists in the current directory
-if [ ! -f "$FILE" ]; then
-    echo "File not found in the current directory!"
+# Downloads and installs AWS CLI
+else
+    echo "AWS CLI not found – installing now..."
+    sleep 1
+    curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
+    sudo installer -pkg ./AWSCLIV2.pkg -target /
+    sleep 1
+    echo "AWS CLI installed – please run command again."
     exit 1
 fi
 
-# Check AWS CLI configuration
-check_aws_cli
+## Prompts bucket selection
+echo -e "Available S3 Buckets:\n"
+aws s3 ls
+read -r -p "Select a bucket: " BUCKET
 
-# Print the bucket name and file name for debugging
-echo "Uploading $FILE to bucket $BUCKET_NAME..."
-
-# Perform the upload to S3
-OUTPUT=$(aws s3 cp "$FILE" s3://$BUCKET_NAME/ 2>&1)
-STATUS=$?
-
-# Print the output of the aws command for debugging
-echo "$OUTPUT"
-
-# Check the exit status of the aws command
-if [ $STATUS -eq 0 ]; then
-    echo "File uploaded successfully!"
+## Bucket and file verifications
+if aws s3api head-bucket --bucket "$BUCKET" 1>/dev/null 2>/dev/null; then
+    echo -e "\n✓ Bucket permissions"
 else
-    echo "File upload failed!"
+    echo "❌ Error – bucket doesn't exist."
+    exit 2
 fi
+
+if [ -f "$1" ]; then
+    echo -e "✓ File (upload) permissions"
+else
+    echo "❌ Error - file doesn't exist"
+    exit 2
+fi
+
+## Uploads file to selected bucket
+BUCKET_PATH="s3://$BUCKET"
+aws s3 cp "$1" "$BUCKET_PATH"
