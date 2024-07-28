@@ -1,46 +1,42 @@
 #!/bin/bash
 
-# Function to display usage information
-display_usage() {
-    echo "Usage: $0 <local-file> <destination-path>"
-    echo "Uploads a file to an S3 Bucket"
+# Function to check if AWS CLI is configured
+function check_aws_cli() {
+    aws sts get-caller-identity > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        echo "AWS CLI is not configured properly. Please run 'aws configure'."
+        exit 1
+    fi
 }
 
-# Function to handle errors
-handle_error() {
-    echo "Error: $1"
-    exit 1
-}
+# Prompt the user for the S3 bucket name
+read -p "Enter the S3 bucket name: " BUCKET_NAME
 
-# Check if the right number of arguments is provided
-if [ "$#" -ne 2 ]; then
-    display_usage
+# Prompt the user for the file name
+read -p "Enter the file name to upload: " FILE
+
+# Check if the file exists in the current directory
+if [ ! -f "$FILE" ]; then
+    echo "File not found in the current directory!"
     exit 1
 fi
 
-# Parse command-line arguments
-local_file="$1"
-destination_path="$2"
+# Check AWS CLI configuration
+check_aws_cli
 
-# Check if the local file exists
-if [ ! -f "$local_file" ]; then
-    handle_error "Local file not found: $local_file"
-fi
+# Print the bucket name and file name for debugging
+echo "Uploading $FILE to bucket $BUCKET_NAME..."
 
-# Prompt user for S3 bucket name
-read -p "Enter the S3 bucket name: " s3_bucket
+# Perform the upload to S3
+OUTPUT=$(aws s3 cp "$FILE" s3://$BUCKET_NAME/ 2>&1)
+STATUS=$?
 
-# Perform file upload to S3
-if aws s3 cp "$local_file" "s3://$s3_bucket/$destination_path"; then
-    echo "Upload completed successfully."
+# Print the output of the aws command for debugging
+echo "$OUTPUT"
+
+# Check the exit status of the aws command
+if [ $STATUS -eq 0 ]; then
+    echo "File uploaded successfully!"
 else
-    handle_error "Upload failed."
-fi
-
-# Check the exit status of the "aws s3 cp" command to determine success
-if [ $? -eq 0 ]; then
-    echo "Upload successful"
-else
-    echo "Error: Upload failed"
-    exit 1
+    echo "File upload failed!"
 fi
