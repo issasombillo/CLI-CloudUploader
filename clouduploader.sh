@@ -1,33 +1,23 @@
 #!/bin/bash
 
-# Check if the number of arguments is exactly 1
-if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 \"/path/to/file\""
+# Check if the correct number of arguments is provided
+if [ "$#" -ne 2 ]; then
+    echo "Usage: $0 <bucket-name> <filename>"
     exit 1
 fi
 
-# Assign the first argument to the FILE variable
-FILE=$1
+BUCKET_NAME=$1
+FILE=$2
 
-# Print the file path for debugging
+# Print the bucket name and file name for debugging
+echo "Bucket name: $BUCKET_NAME"
 echo "File to upload: $FILE"
 
-# Check if the file exists
+# Check if the file exists in the current directory
 if [ ! -f "$FILE" ]; then
-    echo "File not found!"
+    echo "File not found in the current directory!"
     exit 1
 fi
-
-# Set the S3 bucket name
-BUCKET_NAME=issa1
-
-# Print the bucket name for debugging
-echo "Uploading $FILE to bucket $BUCKET_NAME..."
-
-# Print AWS environment variables for debugging
-echo "AWS Access Key: $AWS_ACCESS_KEY_ID"
-echo "AWS Secret Key: $AWS_SECRET_ACCESS_KEY"
-echo "Current Directory: $(pwd)"
 
 # Perform the upload to S3
 aws s3 cp "$FILE" s3://$BUCKET_NAME/
