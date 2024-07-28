@@ -1,8 +1,8 @@
 # CLI-CloudUploader
-Road to Cloud Capstone 1: CloudUploader CLI
+Road to Cloud Capstone 1: CloudUploader CLI Using AWS S3
 
 ## Overview
-This tool allows users to quickly upload files to a specified cloud storage solution.
+CloudUploader CLI is a PowerShell script that allows users to upload files to a specified AWS S3 bucket. This script simplifies the process by prompting the user for the bucket name and file name, then uploading the file to the specified bucket.
 
 ## Prerequisites
 - AWS CLI installed and configured
@@ -12,6 +12,4 @@ This tool allows users to quickly upload files to a specified cloud storage solu
 ```bash
 git clone https://github.com/yourusername/CLI-CloudUploader.git
 cd CLI-CloudUploader
-
-## Usage
 ./clouduploader.sh file.txt
